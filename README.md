@@ -3,8 +3,9 @@ CakeEmailMini
 
 CakePHP(2.3.8)からCakeEmailをむりやりぬきだしたものです
 
-# 使用例
+## 使用例
 
+```php
 <?php
 require_once('repos/lib/CakeEmailMini.php');
 
@@ -19,5 +20,4 @@ $email->subject("Test! Test! Test!");
 $email->charset("ISO-2022-JP");
 $email->headerCharset("ISO-2022-JP");
 $email->send("Test");
-
-
+```
