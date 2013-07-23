@@ -47,9 +47,9 @@ class CakeEmailMini {
  *
  * @var array
  */
-	protected static $_validationPattern = array(
-		'hostname' => '(?:[_a-z0-9][-_a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,})'
-	);
+    protected static $_validationPattern = array(
+        'hostname' => '(?:[_a-z0-9][-_a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,})'
+    );
 
 /**
  * Default X-Mailer
