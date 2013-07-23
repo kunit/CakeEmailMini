@@ -7,7 +7,7 @@ CakePHP(2.3.8)からCakeEmailをむりやりぬきだしたものです
 
 ```php
 <?php
-require_once('repos/lib/CakeEmailMini.php');
+require_once('lib/CakeEmailMini.php');
 
 Configure::write("App.encoding", "UTF-8");
 Configure::write('Security.salt', 'DYhG93b0qyJfIxfs2guVoUubWwvniR2G0FgaC9mi');
