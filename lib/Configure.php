@@ -1,13 +1,15 @@
 <?php
+require_once('Hash.php');
+
 class Configure
 {
-    static public function read($key, $default = null)
+    static public function read($key)
     {
-        $config = include("config.php");
-        if (isset($config[$key])) {
-            return $config[$key];
+        if (defined("CONFIG_DIR")) {
+            $config = include(CONFIG_DIR . DIRECTORY_SEPARATOR . "config.php");
         } else {
-            return $default;
+            $config = include("config.php");
         }
+        return Hash::get($config, $key);
     }
 }
