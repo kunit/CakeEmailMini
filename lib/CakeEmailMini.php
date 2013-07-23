@@ -19,11 +19,10 @@
  */
 require_once("basics.php");
 require_once("exceptions.php");
+require_once("Configure.php");
 require_once("Hash.php");
+require_once("String.php");
 require_once("AbstractTransport.php");
-
-define("APP_ENCODING", "UTF-8");
-define("SECURITY_SALT", "DYhG93b0qyJfIxfs2guVoUubWwvniR2G0FgaC9mi");
 
 /**
  * Cake e-mail class.
@@ -284,7 +283,7 @@ class CakeEmailMini {
  * @param array|string $config Array of configs, or string to load configs from email.php
  */
     public function __construct($config = null) {
-        $this->_appCharset = APP_ENCODING;
+        $this->_appCharset = Configure::read('App.encoding');
         if ($this->_appCharset !== null) {
             $this->charset = $this->_appCharset;
         }
@@ -674,7 +673,7 @@ class CakeEmailMini {
         }
         if ($this->_messageId !== false) {
             if ($this->_messageId === true) {
-                $headers['Message-ID'] = '<' . str_replace('-', '', $this->stringUUID()) . '@' . $this->_domain . '>';
+                $headers['Message-ID'] = '<' . str_replace('-', '', String::UUID()) . '@' . $this->_domain . '>';
             } else {
                 $headers['Message-ID'] = $this->_messageId;
             }
@@ -1341,79 +1340,6 @@ class CakeEmailMini {
             return strtoupper($this->_contentTypeCharset[$charset]);
         }
         return strtoupper($this->charset);
-    }
-
-/**
- * Generate a random UUID
- *
- * @see http://www.ietf.org/rfc/rfc4122.txt
- * @return RFC 4122 UUID
- */
-    public static function stringUUID() {
-        $node = env('SERVER_ADDR');
-
-        if (strpos($node, ':') !== false) {
-            if (substr_count($node, '::')) {
-                $node = str_replace(
-                    '::', str_repeat(':0000', 8 - substr_count($node, ':')) . ':', $node
-                );
-            }
-            $node = explode(':', $node);
-            $ipSix = '';
-
-            foreach ($node as $id) {
-                $ipSix .= str_pad(base_convert($id, 16, 2), 16, 0, STR_PAD_LEFT);
-            }
-            $node = base_convert($ipSix, 2, 10);
-
-            if (strlen($node) < 38) {
-                $node = null;
-            } else {
-                $node = crc32($node);
-            }
-        } elseif (empty($node)) {
-            $host = env('HOSTNAME');
-
-            if (empty($host)) {
-                $host = env('HOST');
-            }
-
-            if (!empty($host)) {
-                $ip = gethostbyname($host);
-
-                if ($ip === $host) {
-                    $node = crc32($host);
-                } else {
-                    $node = ip2long($ip);
-                }
-            }
-        } elseif ($node !== '127.0.0.1') {
-            $node = ip2long($node);
-        } else {
-            $node = null;
-        }
-
-        if (empty($node)) {
-            $node = crc32(SECURITY_SALT);
-        }
-
-        if (function_exists('hphp_get_thread_id')) {
-            $pid = hphp_get_thread_id();
-        } elseif (function_exists('zend_thread_id')) {
-            $pid = zend_thread_id();
-        } else {
-            $pid = getmypid();
-        }
-
-        if (!$pid || $pid > 65535) {
-            $pid = mt_rand(0, 0xfff) | 0x4000;
-        }
-
-        list($timeMid, $timeLow) = explode(' ', microtime());
-        return sprintf(
-            "%08x-%04x-%04x-%02x%02x-%04x%08x", (int)$timeLow, (int)substr($timeMid, 2) & 0xffff,
-            mt_rand(0, 0xfff) | 0x4000, mt_rand(0, 0x3f) | 0x80, mt_rand(0, 0xff), $pid, $node
-        );
     }
 
 /**
