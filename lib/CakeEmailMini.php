@@ -24,7 +24,7 @@ require_once("Utility/Hash.php");
 require_once("Utility/String.php");
 require_once("Utility/Validation.php");
 require_once("Network/CakeSocket.php");
-require_once("Transport/AbstractTransport.php");
+require_once("Network/Email/AbstractTransport.php");
 
 /**
  * Cake e-mail class.
@@ -746,7 +746,7 @@ class CakeEmailMini {
             return $this->_transportClass;
         }
         $transportClassname = $this->_transportName . 'Transport';
-        require_once("Transport" . DIRECTORY_SEPARATOR . "{$transportClassname}.php");
+        require_once("Network" . DIRECTORY_SEPARATOR . "Email" . DIRECTORY_SEPARATOR . "{$transportClassname}.php");
         if (!class_exists($transportClassname)) {
             throw new SocketException(__d('cake_dev', 'Class "%s" not found.', $transportClassname));
         } elseif (!method_exists($transportClassname, 'send')) {
