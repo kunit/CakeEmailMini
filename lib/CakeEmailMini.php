@@ -954,15 +954,7 @@ class CakeEmailMini {
 
         $this->_message = $this->_render($content);
 
-        $contents = $this->transportClass()->send($this);
-        if (!empty($this->_config['log'])) {
-            $level = LOG_DEBUG;
-            if ($this->_config['log'] !== true) {
-                $level = $this->_config['log'];
-            }
-            CakeLog::write($level, PHP_EOL . $contents['headers'] . PHP_EOL . $contents['message']);
-        }
-        return $contents;
+        return $this->transportClass()->send($this);
     }
 
 /**
