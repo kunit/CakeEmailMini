@@ -18,8 +18,6 @@
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-require_once('CakeSocket.php');
-
 /**
  * Send mail using SMTP protocol
  *

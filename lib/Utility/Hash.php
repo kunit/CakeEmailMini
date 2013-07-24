@@ -14,8 +14,6 @@
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
 
-require_once('String.php');
-
 /**
  * Library of array functions for manipulating and extracting data
  * from arrays or 'sets' of data.

@@ -17,12 +17,13 @@
  * @since         CakePHP(tm) v 2.0.0
  * @license       http://www.opensource.org/licenses/mit-license.php MIT License
  */
-require_once("basics.php");
-require_once("exceptions.php");
-require_once("Configure.php");
-require_once("Hash.php");
-require_once("String.php");
-require_once("AbstractTransport.php");
+require_once("Core/basics.php");
+require_once("Core/exceptions.php");
+require_once("Utility/Configure.php");
+require_once("Utility/Hash.php");
+require_once("Utility/String.php");
+require_once("Network/CakeSocket.php");
+require_once("Transport/AbstractTransport.php");
 
 /**
  * Cake e-mail class.
@@ -761,7 +762,7 @@ class CakeEmailMini {
             return $this->_transportClass;
         }
         $transportClassname = $this->_transportName . 'Transport';
-        require_once("{$transportClassname}.php");
+        require_once("Transport" . DIRECTORY_SEPARATOR . "{$transportClassname}.php");
         if (!class_exists($transportClassname)) {
             throw new SocketException(__d('cake_dev', 'Class "%s" not found.', $transportClassname));
         } elseif (!method_exists($transportClassname, 'send')) {
