@@ -22,6 +22,7 @@ require_once("Core/exceptions.php");
 require_once("Utility/Configure.php");
 require_once("Utility/Hash.php");
 require_once("Utility/String.php");
+require_once("Utility/Validation.php");
 require_once("Network/CakeSocket.php");
 require_once("Transport/AbstractTransport.php");
 
@@ -34,23 +35,6 @@ require_once("Transport/AbstractTransport.php");
  * @package       Cake.Network.Email
  */
 class CakeEmailMini {
-
-/**
- * Holds an array of errors messages set in this class.
- * These are used for debugging purposes
- *
- * @var array
- */
-    public static $validationErrors = array();
-
-/**
- * Some complex patterns needed in multiple places
- *
- * @var array
- */
-    protected static $_validationPattern = array(
-        'hostname' => '(?:[_a-z0-9][-_a-z0-9]*\.)*(?:[a-z0-9][-a-z0-9]{0,62})\.(?:(?:[a-z]{2}\.)?[a-z]{2,})'
-    );
 
 /**
  * Default X-Mailer
@@ -492,7 +476,7 @@ class CakeEmailMini {
  */
     protected function _setEmail($varName, $email, $name) {
         if (!is_array($email)) {
-            if (!$this->validationEmail($email)) {
+            if (!Validation::email($email)) {
                 throw new SocketException(__d('cake_dev', 'Invalid email: "%s"', $email));
             }
             if ($name === null) {
@@ -506,7 +490,7 @@ class CakeEmailMini {
             if (is_int($key)) {
                 $key = $value;
             }
-            if (!$this->validationEmail($key)) {
+            if (!Validation::email($key)) {
                 throw new SocketException(__d('cake_dev', 'Invalid email: "%s"', $email));
             }
             $list[$key] = $value;
@@ -546,7 +530,7 @@ class CakeEmailMini {
  */
     protected function _addEmail($varName, $email, $name) {
         if (!is_array($email)) {
-            if (!$this->validationEmail($email)) {
+            if (!Validation::email($email)) {
                 throw new SocketException(__d('cake_dev', 'Invalid email: "%s"', $email));
             }
             if ($name === null) {
@@ -560,7 +544,7 @@ class CakeEmailMini {
             if (is_int($key)) {
                 $key = $value;
             }
-            if (!$this->validationEmail($key)) {
+            if (!Validation::email($key)) {
                 throw new SocketException(__d('cake_dev', 'Invalid email: "%s"', $email));
             }
             $list[$key] = $value;
@@ -1333,87 +1317,5 @@ class CakeEmailMini {
             return strtoupper($this->_contentTypeCharset[$charset]);
         }
         return strtoupper($this->charset);
-    }
-
-/**
- * Validates for an email address.
- *
- * Only uses getmxrr() checking for deep validation if PHP 5.3.0+ is used, or
- * any PHP version on a non-windows distribution
- *
- * @param string $check Value to check
- * @param boolean $deep Perform a deeper validation (if true), by also checking availability of host
- * @param string $regex Regex to use (if none it will use built in regex)
- * @return boolean Success
- */
-    public static function validationEmail($check, $deep = false, $regex = null) {
-        if (is_array($check)) {
-            extract(self::_validationDefaults($check));
-        }
-
-        if (is_null($regex)) {
-            $regex = '/^[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&\'*+\/=?^_`{|}~-]+)*@' . self::$_validationPattern['hostname'] . '$/i';
-        }
-        $return = self::_validationCheck($check, $regex);
-        if ($deep === false || $deep === null) {
-            return $return;
-        }
-
-        if ($return === true && preg_match('/@(' . self::$_validationPattern['hostname'] . ')$/i', $check, $regs)) {
-            if (function_exists('getmxrr') && getmxrr($regs[1], $mxhosts)) {
-                return true;
-            }
-            if (function_exists('checkdnsrr') && checkdnsrr($regs[1], 'MX')) {
-                return true;
-            }
-            return is_array(gethostbynamel($regs[1]));
-        }
-        return false;
-    }
-
-/**
- * Runs a regular expression match.
- *
- * @param string $check Value to check against the $regex expression
- * @param string $regex Regular expression
- * @return boolean Success of match
- */
-    protected static function _validationCheck($check, $regex) {
-        if (is_string($regex) && preg_match($regex, $check)) {
-            return true;
-        }
-        return false;
-    }
-
-/**
- * Get the values to use when value sent to validation method is
- * an array.
- *
- * @param array $params Parameters sent to validation method
- * @return void
- */
-    protected static function _validationDefaults($params) {
-        self::_validationReset();
-        $defaults = array(
-            'check' => null,
-            'regex' => null,
-            'country' => null,
-            'deep' => false,
-            'type' => null
-        );
-        $params = array_merge($defaults, $params);
-        if ($params['country'] !== null) {
-            $params['country'] = mb_strtolower($params['country']);
-        }
-        return $params;
-    }
-
-/**
- * Reset internal variables for another validation run.
- *
- * @return void
- */
-    protected static function _validationReset() {
-        self::$validationErrors = array();
     }
 }
