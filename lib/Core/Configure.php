@@ -6,9 +6,59 @@ class Configure
  *
  * @var array
  */
-	protected static $_values = array(
-		'debug' => 0
-	);
+    protected static $_values = array(
+        'debug' => 0
+    );
+
+/**
+ * Loads stored configuration information from a resource. You can add
+ * config file resource readers with `Configure::config()`.
+ *
+ * Loaded configuration information will be merged with the current
+ * runtime configuration. You can load configuration files from plugins
+ * by preceding the filename with the plugin name.
+ *
+ * `Configure::load('Users.user', 'default')`
+ *
+ * Would load the 'user' config file using the default config reader. You can load
+ * app config files by giving the name of the resource you want loaded.
+ *
+ * `Configure::load('setup', 'default');`
+ *
+ * If using `default` config and no reader has been configured for it yet,
+ * one will be automatically created using PhpReader
+ *
+ * @link http://book.cakephp.org/2.0/en/development/configuration.html#Configure::load
+ * @param string $key name of configuration resource to load.
+ * @param string $config Name of the configured reader to use to read the resource identified by $key.
+ * @param boolean $merge if config files should be merged instead of simply overridden
+ * @return mixed false if file not found, void if load successful.
+ * @throws ConfigureException Will throw any exceptions the reader raises.
+ */
+    public static function load($key, $config = 'default', $merge = true) {
+        if (defined("CONFIG_DIR")) {
+            $filename = sprintf("%s/%s.php", CONFIG_DIR, $key);
+        } else {
+            $filename = sprintf("%s.php", $key);
+        }
+
+        $values = array();
+        if (file_exists($filename)) {
+            include($filename);
+            $values = $config;
+        }
+
+        if ($merge) {
+            $keys = array_keys($values);
+            foreach ($keys as $key) {
+                if (($c = self::read($key)) && is_array($values[$key]) && is_array($c)) {
+                    $values[$key] = Hash::merge($c, $values[$key]);
+                }
+            }
+        }
+
+        return self::write($values);
+    }
 
 /**
  * Used to store a dynamic variable in Configure.

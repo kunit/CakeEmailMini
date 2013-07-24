@@ -19,7 +19,7 @@
  */
 require_once("Core/basics.php");
 require_once("Core/exceptions.php");
-require_once("Utility/Configure.php");
+require_once("Core/Configure.php");
 require_once("Utility/Hash.php");
 require_once("Utility/String.php");
 require_once("Utility/Validation.php");
